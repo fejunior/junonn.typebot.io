@@ -7,10 +7,9 @@ import {
   theme,
 } from '@chakra-ui/react'
 import { useTypebot } from '@/features/editor/providers/TypebotProvider'
-import { useWorkspace } from '@/features/workspace/WorkspaceProvider'
+// import { useWorkspace } from '@/features/workspace/WorkspaceProvider'
 import React, { useMemo } from 'react'
 import { useEndpoints } from '../../providers/EndpointsProvider'
-import { hasProPerks } from '@/features/billing/helpers/hasProPerks'
 import { computeDropOffPath } from '../../helpers/computeDropOffPath'
 import { computeSourceCoordinates } from '../../helpers/computeSourceCoordinates'
 import {
@@ -40,20 +39,18 @@ type Props = {
   blockId: string
   totalVisitedEdges: TotalVisitedEdges[]
   totalAnswers: TotalAnswers[]
-  onUnlockProPlanClick?: () => void
 }
 
 export const DropOffEdge = ({
   totalVisitedEdges,
   totalAnswers,
   blockId,
-  onUnlockProPlanClick,
 }: Props) => {
   const dropOffColor = useColorModeValue(
     theme.colors.red[500],
     theme.colors.red[400]
   )
-  const { workspace } = useWorkspace()
+  // const { workspace } = useWorkspace()
   const { publishedTypebot } = useTypebot()
   const currentBlockId = useMemo(
     () =>
@@ -73,8 +70,6 @@ export const DropOffEdge = ({
     )
   )
   const { sourceEndpointYOffsets: sourceEndpoints } = useEndpoints()
-
-  const isWorkspaceProPlan = hasProPerks(workspace)
 
   const { totalDroppedUser, dropOffRate } = useMemo(() => {
     if (!publishedTypebot || !currentBlockId) return {}
@@ -161,13 +156,9 @@ export const DropOffEdge = ({
         }
       >
         <Tooltip
-          label={
-            isWorkspaceProPlan
-              ? `At this input, ${totalDroppedUser} user${
-                  (totalDroppedUser ?? 2) > 1 ? 's' : ''
-                } left. This represents ${dropOffRate}% of the users who saw this input.`
-              : 'Upgrade your plan to PRO to reveal drop-off rate.'
-          }
+          label={`At this input, ${totalDroppedUser} user${
+            (totalDroppedUser ?? 2) > 1 ? 's' : ''
+          } left. This represents ${dropOffRate}% of the users who saw this input.`}
           placement="top"
         >
           <VStack
@@ -178,29 +169,11 @@ export const DropOffEdge = ({
             justifyContent="center"
             w="full"
             h="full"
-            onClick={isWorkspaceProPlan ? undefined : onUnlockProPlanClick}
-            cursor={isWorkspaceProPlan ? 'auto' : 'pointer'}
             spacing={0.5}
           >
-            <Text filter={isWorkspaceProPlan ? '' : 'blur(2px)'} fontSize="sm">
-              {isWorkspaceProPlan ? (
-                dropOffRate
-              ) : (
-                <Text as="span" filter="blur(2px)">
-                  X
-                </Text>
-              )}
-              %
-            </Text>
+            <Text fontSize="sm">{dropOffRate}%</Text>
             <Tag colorScheme="red" size="sm">
-              {isWorkspaceProPlan ? (
-                totalDroppedUser
-              ) : (
-                <Text as="span" filter="blur(3px)" mr="1">
-                  NN
-                </Text>
-              )}{' '}
-              user{(totalDroppedUser ?? 2) > 1 ? 's' : ''}
+              {totalDroppedUser} user{(totalDroppedUser ?? 2) > 1 ? 's' : ''}
             </Tag>
           </VStack>
         </Tooltip>

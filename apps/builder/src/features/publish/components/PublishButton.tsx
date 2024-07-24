@@ -19,11 +19,9 @@ import {
   UnlockedIcon,
 } from '@/components/icons'
 import { useTypebot } from '@/features/editor/providers/TypebotProvider'
-import { useWorkspace } from '@/features/workspace/WorkspaceProvider'
+// import { useWorkspace } from '@/features/workspace/WorkspaceProvider'
 import { useRouter } from 'next/router'
 import { isNotDefined } from '@typebot.io/lib'
-import { ChangePlanModal } from '@/features/billing/components/ChangePlanModal'
-import { isFreePlan } from '@/features/billing/helpers/isFreePlan'
 import { T, useTranslate } from '@tolgee/react'
 import { trpc } from '@/lib/trpc'
 import { useToast } from '@/hooks/useToast'
@@ -41,9 +39,9 @@ export const PublishButton = ({
   ...props
 }: Props) => {
   const { t } = useTranslate()
-  const { workspace } = useWorkspace()
+  // const { workspace } = useWorkspace()
   const { push, query, pathname } = useRouter()
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const { onOpen } = useDisclosure()
   const {
     isOpen: isNewEngineWarningOpen,
     onOpen: onNewEngineWarningOpen,
@@ -110,7 +108,7 @@ export const PublishButton = ({
 
   const handlePublishClick = async () => {
     if (!typebot?.id) return
-    if (isFreePlan(workspace) && hasInputFile) return onOpen()
+    if (hasInputFile) return onOpen()
     if (!typebot.publicId) {
       await updateTypebot({
         updates: {
@@ -143,11 +141,6 @@ export const PublishButton = ({
 
   return (
     <HStack spacing="1px">
-      <ChangePlanModal
-        isOpen={isOpen}
-        onClose={onClose}
-        type={t('billing.limitMessage.fileInput')}
-      />
       {publishedTypebot && publishedTypebotVersion !== typebot?.version && (
         <ConfirmModal
           isOpen={isNewEngineWarningOpen}

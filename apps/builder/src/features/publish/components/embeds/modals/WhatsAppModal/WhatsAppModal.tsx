@@ -39,9 +39,6 @@ import { NumberInput } from '@/components/inputs'
 import { defaultSessionExpiryTimeout } from '@typebot.io/schemas/features/whatsapp'
 import { SwitchWithRelatedSettings } from '@/components/SwitchWithRelatedSettings'
 import { isDefined } from '@typebot.io/lib/utils'
-import { hasProPerks } from '@/features/billing/helpers/hasProPerks'
-import { UnlockPlanAlertInfo } from '@/components/UnlockPlanAlertInfo'
-import { PlanTag } from '@/features/billing/components/PlanTag'
 import { LogicalOperator } from '@typebot.io/schemas/features/blocks/logic/condition/constants'
 
 export const WhatsAppModal = ({ isOpen, onClose }: ModalProps): JSX.Element => {
@@ -180,12 +177,6 @@ export const WhatsAppModal = ({ isOpen, onClose }: ModalProps): JSX.Element => {
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody as={Stack} spacing="6">
-          {!hasProPerks(workspace) && (
-            <UnlockPlanAlertInfo excludedPlans={['STARTER']}>
-              Upgrade your workspace to <PlanTag plan="PRO" /> to be able to
-              enable WhatsApp integration.
-            </UnlockPlanAlertInfo>
-          )}
           {!isPublished && phoneNumberData?.id && (
             <AlertInfo>You have modifications that can be published.</AlertInfo>
           )}
@@ -281,7 +272,6 @@ export const WhatsAppModal = ({ isOpen, onClose }: ModalProps): JSX.Element => {
 
                 <ListItem>
                   <SwitchWithLabel
-                    isDisabled={!hasProPerks(workspace)}
                     label="Enable WhatsApp integration"
                     initialValue={
                       typebot?.settings.whatsApp?.isEnabled ?? false

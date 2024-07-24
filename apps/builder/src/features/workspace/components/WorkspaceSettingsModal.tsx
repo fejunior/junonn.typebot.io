@@ -9,11 +9,10 @@ import {
   Flex,
 } from '@chakra-ui/react'
 import {
-  CreditCardIcon,
   HardDriveIcon,
-  SettingsIcon,
-  UsersIcon,
+  ChevronLeftIcon,
   WalletIcon,
+  SettingsIcon,
 } from '@/components/icons'
 import { EmojiOrImageIcon } from '@/components/EmojiOrImageIcon'
 import { User, WorkspaceRole } from '@typebot.io/prisma'
@@ -24,7 +23,7 @@ import { WorkspaceInApp, useWorkspace } from '../WorkspaceProvider'
 import packageJson from '../../../../../../package.json'
 import { UserPreferencesForm } from '@/features/account/components/UserPreferencesForm'
 import { MyAccountForm } from '@/features/account/components/MyAccountForm'
-import { BillingSettingsLayout } from '@/features/billing/components/BillingSettingsLayout'
+
 import { useTranslate } from '@tolgee/react'
 import { useParentModal } from '@/features/graph/providers/ParentModalProvider'
 import { CredentialsSettingsForm } from '@/features/credentials/components/CredentialsSettingsForm'
@@ -42,7 +41,6 @@ type SettingsTab =
   | 'user-settings'
   | 'workspace-settings'
   | 'members'
-  | 'billing'
   | 'credentials'
 
 export const WorkspaceSettingsModal = ({
@@ -142,25 +140,12 @@ export const WorkspaceSettingsModal = ({
                 <Button
                   variant={selectedTab === 'members' ? 'solid' : 'ghost'}
                   onClick={() => setSelectedTab('members')}
-                  leftIcon={<UsersIcon />}
+                  leftIcon={<ChevronLeftIcon />}
                   size="sm"
                   justifyContent="flex-start"
                   pl="4"
                 >
                   {t('workspace.settings.modal.menu.members.label')}
-                </Button>
-              )}
-              {canEditWorkspace && (
-                <Button
-                  variant={selectedTab === 'billing' ? 'solid' : 'ghost'}
-                  onClick={() => setSelectedTab('billing')}
-                  leftIcon={<CreditCardIcon />}
-                  size="sm"
-                  justifyContent="flex-start"
-                  pl="4"
-                  overflow="auto"
-                >
-                  {t('workspace.settings.modal.menu.billingAndUsage.label')}
                 </Button>
               )}
             </Stack>
@@ -201,8 +186,6 @@ const SettingsContent = ({
       return <WorkspaceSettingsForm onClose={onClose} />
     case 'members':
       return <MembersList />
-    case 'billing':
-      return <BillingSettingsLayout />
     case 'credentials':
       return <CredentialsSettingsForm />
     default:

@@ -43,12 +43,8 @@ import {
 } from '@/components/logos/WhatsAppLogo'
 import { WhatsAppModal } from './modals/WhatsAppModal/WhatsAppModal'
 import { ParentModalProvider } from '@/features/graph/providers/ParentModalProvider'
-import { useWorkspace } from '@/features/workspace/WorkspaceProvider'
-import { hasProPerks } from '@/features/billing/helpers/hasProPerks'
-import { LockTag } from '@/features/billing/components/LockTag'
-import { Plan } from '@typebot.io/prisma'
-import { FramerModal } from './modals/FramerModal'
 import { FramerLogo } from './logos/FramerLogo'
+import { FramerModal } from './modals/FramerModal'
 
 export type ModalProps = {
   publicId: string
@@ -60,7 +56,6 @@ export type ModalProps = {
 type EmbedButtonProps = Pick<ModalProps, 'publicId' | 'isPublished'> & {
   logo: JSX.Element
   label: string
-  lockTagPlan?: Plan
   modal: (modalProps: { onClose: () => void; isOpen: boolean }) => JSX.Element
 }
 
@@ -68,7 +63,6 @@ export const EmbedButton = ({
   logo,
   label,
   modal,
-  lockTagPlan,
   ...modalProps
 }: EmbedButtonProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -83,15 +77,7 @@ export const EmbedButton = ({
     >
       <VStack>
         {logo}
-        <Text>
-          {label}
-          {lockTagPlan && (
-            <>
-              {' '}
-              <LockTag plan={lockTagPlan} />
-            </>
-          )}
-        </Text>
+        <Text>{label}</Text>
       </VStack>
       {modal({ isOpen, onClose, ...modalProps })}
     </WrapItem>
@@ -99,29 +85,20 @@ export const EmbedButton = ({
 }
 
 export const integrationsList = [
-  (props: Pick<ModalProps, 'publicId' | 'isPublished'>) => {
-    const { workspace } = useWorkspace()
-
-    return (
-      <ParentModalProvider>
-        <EmbedButton
-          logo={
-            <WhatsAppLogo
-              height={100}
-              width="60px"
-              color={whatsAppBrandColor}
-            />
-          }
-          label="WhatsApp"
-          lockTagPlan={hasProPerks(workspace) ? undefined : 'PRO'}
-          modal={({ onClose, isOpen }) => (
-            <WhatsAppModal isOpen={isOpen} onClose={onClose} {...props} />
-          )}
-          {...props}
-        />
-      </ParentModalProvider>
-    )
-  },
+  (props: Pick<ModalProps, 'publicId' | 'isPublished'>) => (
+    <ParentModalProvider>
+      <EmbedButton
+        logo={
+          <WhatsAppLogo height={100} width="60px" color={whatsAppBrandColor} />
+        }
+        label="WhatsApp"
+        modal={({ onClose, isOpen }) => (
+          <WhatsAppModal isOpen={isOpen} onClose={onClose} {...props} />
+        )}
+        {...props}
+      />
+    </ParentModalProvider>
+  ),
   (props: Pick<ModalProps, 'publicId' | 'isPublished'>) => (
     <EmbedButton
       logo={<WordpressLogo height={100} width="70px" />}

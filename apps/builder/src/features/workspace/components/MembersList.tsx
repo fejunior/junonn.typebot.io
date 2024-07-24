@@ -5,12 +5,11 @@ import {
   SkeletonText,
   Stack,
 } from '@chakra-ui/react'
-import { UnlockPlanAlertInfo } from '@/components/UnlockPlanAlertInfo'
 import { WorkspaceInvitation, WorkspaceRole } from '@typebot.io/prisma'
 import React from 'react'
 import { AddMemberForm } from './AddMemberForm'
 import { MemberItem } from './MemberItem'
-import { isDefined } from '@typebot.io/lib'
+// import { isDefined } from '@typebot.io/lib'
 import { useUser } from '@/features/account/hooks/useUser'
 import { useMembers } from '../hooks/useMembers'
 import { deleteInvitationQuery } from '../queries/deleteInvitationQuery'
@@ -19,7 +18,6 @@ import { updateInvitationQuery } from '../queries/updateInvitationQuery'
 import { updateMemberQuery } from '../queries/updateMemberQuery'
 import { Member } from '../types'
 import { useWorkspace } from '../WorkspaceProvider'
-import { getSeatsLimit } from '@typebot.io/billing/helpers/getSeatsLimit'
 import { useTranslate } from '@tolgee/react'
 
 export const MembersList = () => {
@@ -86,39 +84,15 @@ export const MembersList = () => {
     })
   }
 
-  const currentMembersCount =
-    members.filter((member) => member.role !== WorkspaceRole.GUEST).length +
-    invitations.length
-
-  const seatsLimit = workspace ? getSeatsLimit(workspace) : undefined
-
-  const canInviteNewMember =
-    seatsLimit === 'inf'
-      ? true
-      : seatsLimit
-      ? currentMembersCount < seatsLimit
-      : false
-
   return (
     <Stack w="full" spacing={3}>
-      {!canInviteNewMember && (
-        <UnlockPlanAlertInfo>
-          {t('workspace.membersList.unlockBanner.label')}
-        </UnlockPlanAlertInfo>
-      )}
-      {isDefined(seatsLimit) && (
-        <Heading fontSize="2xl">
-          {t('workspace.membersList.title')}{' '}
-          {seatsLimit === -1 ? '' : `(${currentMembersCount}/${seatsLimit})`}
-        </Heading>
-      )}
+      <Heading fontSize="2xl">{t('workspace.membersList.title')}</Heading>
       {workspace?.id && canEdit && (
         <AddMemberForm
           workspaceId={workspace.id}
           onNewInvitation={handleNewInvitation}
           onNewMember={handleNewMember}
           isLoading={isLoading}
-          isLocked={!canInviteNewMember}
         />
       )}
       {members.map((member) => (

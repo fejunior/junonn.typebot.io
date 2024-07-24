@@ -1,11 +1,6 @@
-import { HStack } from '@chakra-ui/react'
 import React from 'react'
 import { BlockIcon } from './BlockIcon'
-import { isFreePlan } from '@/features/billing/helpers/isFreePlan'
-import { Plan } from '@typebot.io/prisma'
-import { useWorkspace } from '@/features/workspace/WorkspaceProvider'
 import { BlockLabel } from './BlockLabel'
-import { LockTag } from '@/features/billing/components/LockTag'
 import { useTranslate } from '@tolgee/react'
 import { BubbleBlockType } from '@typebot.io/schemas/features/blocks/bubbles/constants'
 import { InputBlockType } from '@typebot.io/schemas/features/blocks/inputs/constants'
@@ -28,84 +23,44 @@ export const BlockCard = (
   props: Pick<Props, 'type' | 'onMouseDown'>
 ): JSX.Element => {
   const { t } = useTranslate()
-  const { workspace } = useWorkspace()
 
   if (isForgedBlockType(props.type)) {
     return <ForgedBlockCard type={props.type} onMouseDown={props.onMouseDown} />
   }
+
+  const renderBlockCardLayout = (tooltip: string) => (
+    <BlockCardLayout {...props} tooltip={tooltip}>
+      <BlockIcon type={props.type} />
+      <BlockLabel type={props.type} />
+    </BlockCardLayout>
+  )
+
   switch (props.type) {
     case BubbleBlockType.EMBED:
-      return (
-        <BlockCardLayout
-          {...props}
-          tooltip={t('blocks.bubbles.embed.blockCard.tooltip')}
-        >
-          <BlockIcon type={props.type} />
-          <BlockLabel type={props.type} />
-        </BlockCardLayout>
-      )
+      return renderBlockCardLayout(t('blocks.bubbles.embed.blockCard.tooltip'))
     case InputBlockType.FILE:
-      return (
-        <BlockCardLayout
-          {...props}
-          tooltip={t('blocks.inputs.fileUpload.blockCard.tooltip')}
-        >
-          <BlockIcon type={props.type} />
-          <HStack>
-            <BlockLabel type={props.type} />
-            {isFreePlan(workspace) && <LockTag plan={Plan.STARTER} />}
-          </HStack>
-        </BlockCardLayout>
+      return renderBlockCardLayout(
+        t('blocks.inputs.fileUpload.blockCard.tooltip')
       )
     case LogicBlockType.SCRIPT:
-      return (
-        <BlockCardLayout
-          {...props}
-          tooltip={t('editor.blockCard.logicBlock.tooltip.code.label')}
-        >
-          <BlockIcon type={props.type} />
-          <BlockLabel type={props.type} />
-        </BlockCardLayout>
+      return renderBlockCardLayout(
+        t('editor.blockCard.logicBlock.tooltip.code.label')
       )
     case LogicBlockType.TYPEBOT_LINK:
-      return (
-        <BlockCardLayout
-          {...props}
-          tooltip={t('editor.blockCard.logicBlock.tooltip.typebotLink.label')}
-        >
-          <BlockIcon type={props.type} />
-          <BlockLabel type={props.type} />
-        </BlockCardLayout>
+      return renderBlockCardLayout(
+        t('editor.blockCard.logicBlock.tooltip.typebotLink.label')
       )
     case LogicBlockType.JUMP:
-      return (
-        <BlockCardLayout
-          {...props}
-          tooltip={t('editor.blockCard.logicBlock.tooltip.jump.label')}
-        >
-          <BlockIcon type={props.type} />
-          <BlockLabel type={props.type} />
-        </BlockCardLayout>
+      return renderBlockCardLayout(
+        t('editor.blockCard.logicBlock.tooltip.jump.label')
       )
     case IntegrationBlockType.GOOGLE_SHEETS:
-      return (
-        <BlockCardLayout
-          {...props}
-          tooltip={t('blocks.integrations.googleSheets.blockCard.tooltip')}
-        >
-          <BlockIcon type={props.type} />
-          <BlockLabel type={props.type} />
-        </BlockCardLayout>
+      return renderBlockCardLayout(
+        t('blocks.integrations.googleSheets.blockCard.tooltip')
       )
     case IntegrationBlockType.GOOGLE_ANALYTICS:
-      return (
-        <BlockCardLayout
-          {...props}
-          tooltip={t('blocks.integrations.googleAnalytics.blockCard.tooltip')}
-        >
-          <BlockIcon type={props.type} />
-          <BlockLabel type={props.type} />
-        </BlockCardLayout>
+      return renderBlockCardLayout(
+        t('blocks.integrations.googleAnalytics.blockCard.tooltip')
       )
     default:
       return (

@@ -10,27 +10,22 @@ import {
   IconButton,
   Stack,
   Wrap,
-  Text,
 } from '@chakra-ui/react'
-import { Plan } from '@typebot.io/prisma'
 import { isDefined, isNotDefined } from '@typebot.io/lib'
 import { isPublicDomainAvailableQuery } from '../queries/isPublicDomainAvailableQuery'
 import { EditableUrl } from './EditableUrl'
 import { integrationsList } from './embeds/EmbedButton'
 import { useTypebot } from '@/features/editor/providers/TypebotProvider'
-import { LockTag } from '@/features/billing/components/LockTag'
-import { UpgradeButton } from '@/features/billing/components/UpgradeButton'
-import { hasProPerks } from '@/features/billing/helpers/hasProPerks'
 import { CustomDomainsDropdown } from '@/features/customDomains/components/CustomDomainsDropdown'
 import { TypebotHeader } from '@/features/editor/components/TypebotHeader'
 import { parseDefaultPublicId } from '../helpers/parseDefaultPublicId'
-import { useTranslate } from '@tolgee/react'
+// import { useTranslate } from '@tolgee/react'
 import { env } from '@typebot.io/env'
 import DomainStatusIcon from '@/features/customDomains/components/DomainStatusIcon'
 import { TypebotNotFoundPage } from '@/features/editor/components/TypebotNotFoundPage'
 
 export const SharePage = () => {
-  const { t } = useTranslate()
+  // const { t } = useTranslate()
   const { workspace } = useWorkspace()
   const { typebot, updateTypebot, publishedTypebot, is404 } = useTypebot()
   const { showToast } = useToast()
@@ -131,22 +126,9 @@ export const SharePage = () => {
             )}
             {isNotDefined(typebot?.customDomain) &&
             env.NEXT_PUBLIC_VERCEL_VIEWER_PROJECT_NAME ? (
-              <>
-                {hasProPerks(workspace) ? (
-                  <CustomDomainsDropdown
-                    onCustomDomainSelect={handleCustomDomainChange}
-                  />
-                ) : (
-                  <UpgradeButton
-                    colorScheme="gray"
-                    limitReachedType={t('billing.limitMessage.customDomain')}
-                    excludedPlans={[Plan.STARTER]}
-                  >
-                    <Text mr="2">Add my domain</Text>{' '}
-                    <LockTag plan={Plan.PRO} />
-                  </UpgradeButton>
-                )}
-              </>
+              <CustomDomainsDropdown
+                onCustomDomainSelect={handleCustomDomainChange}
+              />
             ) : null}
           </Stack>
 
