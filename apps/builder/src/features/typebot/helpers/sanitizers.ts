@@ -16,7 +16,7 @@ export const sanitizeSettings = (
   publicShare: mode === 'create' ? undefined : settings.publicShare,
   general: {
     ...settings.general,
-    isBrandingEnabled: workspacePlan === 'JunonnLabs',
+    isBrandingEnabled: workspacePlan === 'UNLIMITED',
   },
   whatsApp: settings.whatsApp
     ? {

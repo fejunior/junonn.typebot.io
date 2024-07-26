@@ -22,7 +22,7 @@ export const CreateFolderButton = ({ isLoading, onClick }: Props) => {
     >
       <HStack>
         <Text>{t('folders.createFolderButton.label')}</Text>
-        {workspace?.plan === 'JunonnLabs' && <Text>{workspace.plan}</Text>}
+        {workspace?.plan === 'UNLIMITED' && <Text>{workspace.plan}</Text>}
       </HStack>
     </Button>
   )

@@ -24,7 +24,7 @@ export const SupportBubble = (props: Omit<BubbleProps, 'typebot'>) => {
         Email: user?.email ?? undefined,
         'Typebot ID': lastViewedTypebotId,
         'Avatar URL': user?.image ?? undefined,
-        Plan: 'JunonnLabs',
+        Plan: 'UNLIMITED',
       }}
       theme={{
         chatWindow: {
