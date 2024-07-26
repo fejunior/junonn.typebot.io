@@ -1,5 +1,4 @@
 import { AlertIcon } from '@/components/icons'
-import { BillingPortalButton } from '@/features/billing/components/BillingPortalButton'
 import { DashboardHeader } from '@/features/dashboard/components/DashboardHeader'
 import { useWorkspace } from '@/features/workspace/WorkspaceProvider'
 import { Heading, VStack, Text } from '@chakra-ui/react'
@@ -11,7 +10,7 @@ export default function Page() {
   const { workspace } = useWorkspace()
 
   useEffect(() => {
-    if (!workspace || workspace.isPastDue) return
+    if (!workspace) return
     replace('/typebots')
   }, [replace, workspace])
 
@@ -25,11 +24,10 @@ export default function Page() {
         spacing={4}
       >
         <AlertIcon width="40px" />
-        <Heading fontSize="2xl">Your workspace has unpaid invoice(s).</Heading>
-        <Text>Head over to the billing portal to pay it.</Text>
-        {workspace?.id && (
-          <BillingPortalButton workspaceId={workspace?.id} colorScheme="blue" />
-        )}
+        <Heading fontSize="2xl">Your workspace is ready!</Heading>
+        <Text>
+          Head over to the dashboard to start working with your Typebots.
+        </Text>
       </VStack>
     </>
   )
