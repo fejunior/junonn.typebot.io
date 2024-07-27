@@ -289,9 +289,6 @@ importers:
       '@playwright/test':
         specifier: 1.45.2
         version: 1.45.2
-      '@typebot.io/billing':
-        specifier: workspace:*
-        version: link:../../ee/packages/billing
       '@typebot.io/forge':
         specifier: workspace:*
         version: link:../../packages/forge/core
@@ -575,9 +572,6 @@ importers:
       '@emotion/styled':
         specifier: 11.11.5
         version: 11.11.5(@emotion/react@11.11.4(@types/react@18.2.15)(react@18.2.0))(@types/react@18.2.15)(react@18.2.0)
-      '@typebot.io/billing':
-        specifier: workspace:*
-        version: link:../../packages/billing
       '@typebot.io/lib':
         specifier: workspace:*
         version: link:../../../packages/lib
@@ -1973,9 +1967,6 @@ importers:
       '@paralleldrive/cuid2':
         specifier: 2.2.1
         version: 2.2.1
-      '@typebot.io/billing':
-        specifier: workspace:*
-        version: link:../../ee/packages/billing
       '@typebot.io/results':
         specifier: workspace:*
         version: link:../results

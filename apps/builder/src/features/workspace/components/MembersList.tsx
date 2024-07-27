@@ -93,6 +93,7 @@ export const MembersList = () => {
           onNewInvitation={handleNewInvitation}
           onNewMember={handleNewMember}
           isLoading={isLoading}
+          isLocked={false}
         />
       )}
       {members.map((member) => (

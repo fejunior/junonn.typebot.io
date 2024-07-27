@@ -26,7 +26,6 @@ export const Edges = ({
   inputBlockIds,
   totalVisitedEdges,
   totalAnswers,
-  onUnlockProPlanClick,
 }: Props) => {
   const { connectingIds } = useGraph()
   const isDark = useColorMode().colorMode === 'dark'
@@ -64,7 +63,6 @@ export const Edges = ({
             blockId={blockId}
             totalVisitedEdges={totalVisitedEdges}
             totalAnswers={totalAnswers}
-            onUnlockProPlanClick={onUnlockProPlanClick}
           />
         ))}
       <marker

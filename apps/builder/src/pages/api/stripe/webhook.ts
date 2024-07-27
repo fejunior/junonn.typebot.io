@@ -1,6 +1,5 @@
 import Cors from 'micro-cors'
-import { RequestHandler } from 'next/dist/server/next'
-import { webhookHandler } from '@typebot.io/billing/api/webhookHandler'
+import { IncomingMessage, ServerResponse } from 'http'
 
 const cors = Cors({
   allowMethods: ['POST', 'HEAD'],
@@ -12,4 +11,14 @@ export const config = {
   },
 }
 
-export default cors(webhookHandler as RequestHandler)
+// A placeholder handler since webhookHandler is removed.
+const placeholderHandler = async (
+  req: IncomingMessage,
+  res: ServerResponse
+) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' })
+  res.end('This endpoint is not used in JunonnLabs plan.')
+  return Promise.resolve()
+}
+
+export default cors(placeholderHandler)
