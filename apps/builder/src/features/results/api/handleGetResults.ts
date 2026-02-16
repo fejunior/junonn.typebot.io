@@ -76,7 +76,7 @@ export const handleGetResults = async ({
   );
   const toDate = parseToDateFromTimeFilter(input.timeFilter, input.timeZone);
 
-  const results = await prisma.result.findMany({
+  const queriedResults = await prisma.result.findMany({
     take: limit + 1,
     skip: cursor,
     where: {
@@ -111,14 +111,19 @@ export const handleGetResults = async ({
     },
   });
 
+  const hasMoreResults = queriedResults.length > limit;
+  const paginatedResults = hasMoreResults
+    ? queriedResults.slice(0, limit)
+    : queriedResults;
+
   let nextCursor: number | undefined;
-  if (results.length > limit && isDefined(cursor)) {
+  if (hasMoreResults && isDefined(cursor)) {
     nextCursor = cursor + limit;
   }
 
   return {
     results: z.array(resultWithAnswersSchema).parse(
-      results.map((r) => ({
+      paginatedResults.map((r) => ({
         ...r,
         answers: r.answersV2
           .concat(r.answers)
