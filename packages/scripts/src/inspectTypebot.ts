@@ -35,6 +35,7 @@ const inspectTypebot = async () => {
       publicId: true,
       customDomain: true,
       createdAt: true,
+      updatedAt: true,
       isArchived: true,
       isClosed: true,
       publishedTypebot: {
