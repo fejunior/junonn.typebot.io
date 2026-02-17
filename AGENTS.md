@@ -53,8 +53,8 @@ Source code for dependencies is then available in `opensrc/`.
 
 ## effect-solutions
 
-1. Run `effect-solutions list` to see available guides
-2. Run `effect-solutions show <topic>...` for relevant patterns (supports multiple topics)
+1. Run `bunx effect-solutions list` to see available guides
+2. Run `bunx effect-solutions show <topic>...` for relevant patterns (supports multiple topics)
 3. Search `opensrc/repos/github.com/Effect-TS/effect` for source code and real implementations
 
 Topics: quick-start, project-setup, tsconfig, basics, services-and-layers, data-modeling, error-handling, config, testing, cli.
