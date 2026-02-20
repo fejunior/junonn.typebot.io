@@ -2,8 +2,6 @@
 title: HTTP Request
 ---
 
-import { LoomVideo } from '/snippets/loom-video.mdx'
-
 The HTTP Request block allows you to send an HTTP request to a 3rd party service. This is useful to send information from the bot to another service or to fetch information from another service and use it in the bot.
 
 ## Make an API request and fetch data
@@ -48,7 +46,7 @@ What I need in my case is instead of inserting "Star Wars", I'd like to insert a
 
 Then, we can set a test value for our variable (it will replace the variable with this value only for the "Test the request" button):
 
-<Frame style={{ maxWidth: '300px' }}>
+<Frame style={{ maxWidth: "300px" }}>
   <img
     src="/images/blocks/integrations/http-request/variable-test-value.png"
     alt="Variable test values"
@@ -57,7 +55,7 @@ Then, we can set a test value for our variable (it will replace the variable wit
 
 Hit the "Test the request" button and then we can save the result in multiple variables:
 
-<Frame style={{ maxWidth: '400px' }}>
+<Frame style={{ maxWidth: "400px" }}>
   <img
     src="/images/blocks/integrations/http-request/save-in-variable.png"
     alt="Test request"
@@ -67,7 +65,10 @@ Hit the "Test the request" button and then we can save the result in multiple va
 Then we can use these variables to display dynamic content in the next bubbles:
 
 <Frame>
-  <img src="/images/blocks/integrations/http-request/preview.png" alt="Preview" />
+  <img
+    src="/images/blocks/integrations/http-request/preview.png"
+    alt="Preview"
+  />
 </Frame>
 
 Possibilities are endless when it comes to API calls, you can litteraly call any API and fetch any data you want.
@@ -98,9 +99,3 @@ By default, the Webhook block will wait 10 seconds for the 3rd party service to 
 The Webhook block request fail or didn't seem to trigger? Make sure to check the [logs](/results/overview#logs). If you still can't figure out what went wrong, shoot me a message using the chat button directly in the tool 👍
 
 You can use tools like [Webhook Tester](https://webhook-test.com/) to see payloads of webhooks for debugging and troubleshooting.
-
-### Webhook is not executed in the right order?
-
-That is expected, Typebot actually computes all the blocks between each input blocks from a server before displaying anything.
-
-<LoomVideo id="9cc00a9a8c8245709d6322f197c9fb45" />
