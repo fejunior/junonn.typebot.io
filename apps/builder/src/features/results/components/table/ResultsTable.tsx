@@ -210,19 +210,16 @@ export const ResultsTable = ({
     return () => {
       observer.disconnect();
     };
-    // We need to rerun this effect when the bottomElement changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [handleObserver, bottomElement.current]);
 
   return (
-    <div className="flex flex-col max-w-[1600px] px-4 overflow-y-hidden gap-6">
+    <div className="flex flex-col max-w-400 px-4 overflow-y-hidden gap-6">
       <div className="flex items-center gap-2 w-full justify-end">
-        {currentUserMode === "write" && (
-          <SelectionToolbar
-            selectedResultsId={Object.keys(rowSelection)}
-            onClearSelection={() => setRowSelection({})}
-          />
-        )}
+        <SelectionToolbar
+          selectedResultsId={Object.keys(rowSelection)}
+          onClearSelection={() => setRowSelection({})}
+          userMode={currentUserMode}
+        />
         <TimeFilterSelect
           size="sm"
           timeFilter={timeFilter}
@@ -263,9 +260,8 @@ export const ResultsTable = ({
             {hasMore === true && (
               <LoadingRows
                 totalColumns={
-                  resultHeader.filter(
-                    (header) => columnsVisibility[header.id] !== false,
-                  ).length + 1
+                  resultHeader.filter((header) => columnsVisibility[header.id])
+                    .length + 1
                 }
               />
             )}

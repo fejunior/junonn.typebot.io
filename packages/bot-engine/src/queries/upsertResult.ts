@@ -85,7 +85,7 @@ export const upsertResult = ({
     create: {
       id: resultId,
       typebotId: typebot.id,
-      isCompleted: isCompleted ? true : false,
+      isCompleted,
       hasStarted,
       variables: variablesWithValue,
       lastChatSessionId,

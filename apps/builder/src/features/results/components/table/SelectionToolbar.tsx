@@ -17,11 +17,13 @@ import { useResults } from "../../ResultsProvider";
 type Props = {
   selectedResultsId: string[];
   onClearSelection: () => void;
+  userMode: "write" | "read" | "guest";
 };
 
 export const SelectionToolbar = ({
   selectedResultsId,
   onClearSelection,
+  userMode,
 }: Props) => {
   const { typebot } = useTypebot();
   const { resultHeader, tableData, onDeleteResults } = useResults();
@@ -143,32 +145,36 @@ export const SelectionToolbar = ({
       >
         <Download01Icon />
       </Button>
-      <Button
-        variant="secondary"
-        aria-label="Delete"
-        className="rounded-l-none size-8"
-        onClick={onOpen}
-        disabled={isDeleteLoading}
-        size="icon"
-      >
-        <TrashIcon />
-      </Button>
-      <ConfirmDialog
-        isOpen={isOpen}
-        onConfirm={deleteResults}
-        onClose={onClose}
-        actionType="destructive"
-        confirmButtonLabel="Delete"
-      >
-        <p>
-          You are about to delete{" "}
-          <strong>
-            {totalSelected} submission
-            {totalSelected > 1 ? "s" : ""}
-          </strong>
-          . Are you sure you wish to continue?
-        </p>
-      </ConfirmDialog>
+      {userMode === "write" && (
+        <>
+          <Button
+            variant="secondary"
+            aria-label="Delete"
+            className="rounded-l-none size-8"
+            onClick={onOpen}
+            disabled={isDeleteLoading}
+            size="icon"
+          >
+            <TrashIcon />
+          </Button>
+          <ConfirmDialog
+            isOpen={isOpen}
+            onConfirm={deleteResults}
+            onClose={onClose}
+            actionType="destructive"
+            confirmButtonLabel="Delete"
+          >
+            <p>
+              You are about to delete{" "}
+              <strong>
+                {totalSelected} submission
+                {totalSelected > 1 ? "s" : ""}
+              </strong>
+              . Are you sure you wish to continue?
+            </p>
+          </ConfirmDialog>
+        </>
+      )}
     </div>
   );
 };
