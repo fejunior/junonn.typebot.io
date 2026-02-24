@@ -19,13 +19,17 @@ const BATCH_SIZE = 500;
 export const streamAllResultsToCsv = async (
   typebotId: string,
   {
+    full = false,
     writeStreamPath,
     writableStream,
     onProgressUpdate,
+    resultIds,
   }: {
+    full?: boolean;
     writeStreamPath?: PathLike;
     writableStream?: Writable;
     onProgressUpdate: (progress: number) => void;
+    resultIds?: string[];
   },
 ): Promise<
   | {
@@ -56,6 +60,7 @@ export const streamAllResultsToCsv = async (
       typebotId,
       hasStarted: true,
       isArchived: false,
+      id: resultIds ? { in: resultIds } : undefined,
     },
   });
 
@@ -89,7 +94,7 @@ export const streamAllResultsToCsv = async (
     resultsTablePreferences?.columnsOrder,
     resultHeader,
   ).reduce<string[]>((currentHeaderIds, columnId) => {
-    if (resultsTablePreferences?.columnsVisibility[columnId] === false)
+    if (resultsTablePreferences?.columnsVisibility[columnId] === false && !full)
       return currentHeaderIds;
     const columnLabel = resultHeader.find(
       (headerCell) => headerCell.id === columnId,
@@ -130,6 +135,7 @@ export const streamAllResultsToCsv = async (
             await prisma.result.findMany({
               take: BATCH_SIZE,
               where: {
+                id: resultIds ? { in: resultIds } : undefined,
                 typebotId,
                 hasStarted: true,
                 isArchived: false,

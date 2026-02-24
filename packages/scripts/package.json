@@ -27,6 +27,8 @@
     "exportResults": "SKIP_ENV_CHECK=true dotenv -e ./.env.production -- tsx src/exportResults.ts",
     "updateUserEmail": "SKIP_ENV_CHECK=true dotenv -e ./.env.production -- tsx src/updateUserEmail.ts",
     "inspectChatSession": "tsx src/inspectChatSession.ts",
+    "searchResult": "SKIP_ENV_CHECK=true dotenv -e ./.env.production -- tsx src/searchResult.ts",
+    "inspectResult": "SKIP_ENV_CHECK=true dotenv -e ./.env.production -- tsx src/inspectResult.ts",
     "inspectCredentials": "tsx src/inspectCredentials.ts",
     "deleteChatSession": "tsx src/deleteChatSession.ts",
     "checkDependencies": "tsx src/checkDependencies.ts",

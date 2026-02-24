@@ -153,12 +153,15 @@ export const continueBotFlow = async (
         );
         newSessionState = updatedState;
         setVariableHistory.push(...newSetVariableHistory);
-        return continueBotFlow(undefined, {
-          state: newSessionState,
-          version,
-          textBubbleContentFormat,
-          sessionStore,
-        });
+        return {
+          ...(await continueBotFlow(undefined, {
+            state: newSessionState,
+            version,
+            textBubbleContentFormat,
+            sessionStore,
+          })),
+          setVariableHistory,
+        };
       }
     }
 
@@ -171,12 +174,15 @@ export const continueBotFlow = async (
           });
         newSessionState = updatedState;
         setVariableHistory.push(...newSetVariableHistory);
-        return continueBotFlow(undefined, {
-          state: newSessionState,
-          version,
-          textBubbleContentFormat,
-          sessionStore,
-        });
+        return {
+          ...(await continueBotFlow(undefined, {
+            state: newSessionState,
+            version,
+            textBubbleContentFormat,
+            sessionStore,
+          })),
+          setVariableHistory,
+        };
       }
       return {
         ...(await parseRetryMessage(block, {

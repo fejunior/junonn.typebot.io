@@ -530,7 +530,7 @@ const removeLiteBadgeCss = (code: string) => {
   } while (code !== prevCode);
 
   // Clean up any empty media queries or other nested rules
-  return code.replace(/@[^{]+{[\s]*}/gm, "");
+  return code.replace(/@[^{]+{\s*}/gm, "");
 };
 
 const convertStartTypebotToTypebotInSession = (
@@ -558,7 +558,7 @@ const convertStartTypebotToTypebotInSession = (
     variables: startVariables,
     events: typebot.events,
     systemMessages: typebot.settings.general?.systemMessages,
-  } as TypebotInSessionV5; // I am not sure why, this needs to be casted, the discrimination does not work here
+  } as TypebotInSessionV5; // I am not sure why. This needs to be cast. The discrimination does not work here
 };
 
 const extractVariableIdsUsedForTranscript = (

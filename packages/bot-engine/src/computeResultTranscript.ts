@@ -1,10 +1,20 @@
 import { BubbleBlockType } from "@typebot.io/blocks-bubbles/constants";
-import { isBubbleBlock, isInputBlock } from "@typebot.io/blocks-core/helpers";
+import {
+  isBubbleBlock,
+  isInputBlock,
+  isInputBlockType,
+} from "@typebot.io/blocks-core/helpers";
 import { InputBlockType } from "@typebot.io/blocks-inputs/constants";
 import { LogicBlockType } from "@typebot.io/blocks-logic/constants";
 import type { ContinueChatResponse } from "@typebot.io/chat-api/schemas";
-import type { TypebotInSession } from "@typebot.io/chat-session/schemas";
+import type {
+  TypebotInSession,
+  TypebotInSessionV5,
+  TypebotInSessionV6,
+} from "@typebot.io/chat-session/schemas";
 import { executeCondition } from "@typebot.io/conditions/executeCondition";
+import { EventType } from "@typebot.io/events/constants";
+import type { ReplyEvent } from "@typebot.io/events/schemas";
 import type { Group } from "@typebot.io/groups/schemas";
 import { createId } from "@typebot.io/lib/createId";
 import { isDefined } from "@typebot.io/lib/utils";
@@ -84,6 +94,7 @@ export const computeResultTranscript = ({
   visitedEdges,
   currentBlockId,
   sessionStore,
+  debug = false,
 }: {
   typebot: TypebotInSession;
   answers: Answer[];
@@ -91,6 +102,7 @@ export const computeResultTranscript = ({
   visitedEdges: string[];
   currentBlockId?: string;
   sessionStore: SessionStore;
+  debug?: boolean;
 }): TranscriptMessage[] => {
   const firstEdgeId = getFirstEdgeId(typebot);
   if (!firstEdgeId) return [];
@@ -114,6 +126,8 @@ export const computeResultTranscript = ({
     currentBlockId,
     sessionStore,
     userMessageIndex,
+    returnEdgeId: undefined,
+    debug,
   });
 };
 
@@ -141,6 +155,13 @@ const getNextGroup = (
   return { group, blockIndex };
 };
 
+const findReplyEvent = (
+  typebot: TypebotInSession,
+): (ReplyEvent & { outgoingEdgeId: string }) | undefined =>
+  typebot.events?.find(
+    (event) => event.type === EventType.REPLY && event.outgoingEdgeId,
+  ) as (ReplyEvent & { outgoingEdgeId: string }) | undefined;
+
 // -----------------------------------------------------------------------------
 // 🚶‍♂️  Graph traversal ──────────────────────────────────────────────────────────
 // -----------------------------------------------------------------------------
@@ -153,6 +174,8 @@ const executeGroup = ({
   currentBlockId,
   sessionStore,
   userMessageIndex,
+  returnEdgeId,
+  debug,
 }: {
   currentTranscript: TranscriptMessage[];
   nextGroup: { group: Group; blockIndex?: number } | undefined;
@@ -166,6 +189,8 @@ const executeGroup = ({
   currentBlockId?: string;
   sessionStore: SessionStore;
   userMessageIndex: { value: number };
+  returnEdgeId: string | undefined;
+  debug: boolean;
 }): TranscriptMessage[] => {
   if (!nextGroup) return currentTranscript;
 
@@ -183,18 +208,13 @@ const executeGroup = ({
 
     const typebot = typebotsQueue[0]?.typebot;
     if (!typebot) throw new Error("Typebot not found in session");
+    const replyEvent = findReplyEvent(typebot);
 
-    if (setVariableHistory.peek()?.blockId === block.id) {
-      const currentBlockIndex = setVariableHistory.peek()?.blockIndex;
-      do {
-        typebot.variables = applySetVariable(
-          setVariableHistory.next(),
-          typebot,
-        );
-      } while (
-        isDefined(currentBlockIndex) &&
-        setVariableHistory.peek()?.blockIndex === currentBlockIndex
-      );
+    if (
+      setVariableHistory.peek()?.blockId === block.id &&
+      (!replyEvent || !isInputBlockType(block.type))
+    ) {
+      applyVariables(setVariableHistory, typebot);
     }
 
     let nextEdgeId = block.outgoingEdgeId;
@@ -214,7 +234,10 @@ const executeGroup = ({
       );
       const newMessage =
         convertChatMessageToTranscriptMessage(parsedBubbleBlock);
-      if (newMessage) currentTranscript.push(newMessage);
+      if (newMessage) {
+        currentTranscript.push(newMessage);
+        if (debug) console.log("[bot]", parseTranscriptMessageText(newMessage));
+      }
     }
     // ──────────────────────────────────────────────────────────── Input blocks
     else if (isInputBlock(block)) {
@@ -273,6 +296,8 @@ const executeGroup = ({
             : answer.content,
       });
 
+      if (debug) console.log("[user]", answer.content);
+
       const parsedReply = validateAndParseInputMessage(
         {
           type: "text",
@@ -288,6 +313,10 @@ const executeGroup = ({
       );
 
       if (parsedReply.status === "fail") {
+        console.log("FAIL:", {
+          answer: JSON.stringify(answer, null, 2),
+          block: JSON.stringify(block, null, 2),
+        });
         throw new Error(
           "Parsed reply is in fail status when computing result transcript",
         );
@@ -299,10 +328,54 @@ const executeGroup = ({
         sessionStore,
       });
 
-      if (!replyOutgoingEdge) continue;
+      if (replyEvent) {
+        if (setVariableHistory.peek()?.blockId === block.id) {
+          applyVariables(setVariableHistory, typebot);
+        }
+        const returnEdgeId =
+          replyOutgoingEdge?.id ??
+          (() => {
+            const currentBlockIndex = nextGroup.group.blocks.findIndex(
+              (b) => b.id === block.id,
+            );
+            const nextBlockInGroup = nextGroup.group.blocks.at(
+              currentBlockIndex + 1,
+            );
+            if (!nextBlockInGroup) return undefined;
+            const virtualId = createVirtualEdgeId({
+              groupId: nextGroup.group.id,
+              blockId: nextBlockInGroup.id,
+            });
+            typebotsQueue[0].typebot.edges.push({
+              id: virtualId,
+              from: { blockId: block.id },
+              to: {
+                groupId: nextGroup.group.id,
+                blockId: nextBlockInGroup.id,
+              },
+            });
+            return virtualId;
+          })();
+        const eventNextGroup = getNextGroup(typebot, replyEvent.outgoingEdgeId);
+        if (eventNextGroup) {
+          return executeGroup({
+            typebotsQueue,
+            queues,
+            currentTranscript,
+            nextGroup: eventNextGroup,
+            currentBlockId,
+            sessionStore,
+            userMessageIndex,
+            returnEdgeId,
+            debug,
+          });
+        }
+      } else {
+        if (!replyOutgoingEdge) continue;
 
-      if (replyOutgoingEdge.isOffDefaultPath) visitedEdges.next();
-      nextEdgeId = replyOutgoingEdge.id;
+        if (replyOutgoingEdge.isOffDefaultPath) visitedEdges.next();
+        nextEdgeId = replyOutgoingEdge.id;
+      }
     }
     // ──────────────────────────────────────────────────────────── Condition
     else if (block.type === LogicBlockType.CONDITION) {
@@ -334,10 +407,9 @@ const executeGroup = ({
         },
       });
       nextEdgeId = virtualId;
-    } else if (
-      block.type === LogicBlockType.AB_TEST ||
-      block.type === LogicBlockType.RETURN
-    ) {
+    } else if (block.type === LogicBlockType.RETURN && returnEdgeId) {
+      nextEdgeId = returnEdgeId;
+    } else if (block.type === LogicBlockType.AB_TEST) {
       nextEdgeId = visitedEdges.next();
     }
     // ──────────────────────────────────────────────────────────── Typebot link
@@ -384,6 +456,8 @@ const executeGroup = ({
         currentBlockId,
         sessionStore,
         userMessageIndex,
+        returnEdgeId,
+        debug,
       });
     }
 
@@ -399,6 +473,8 @@ const executeGroup = ({
           currentBlockId,
           sessionStore,
           userMessageIndex,
+          returnEdgeId,
+          debug,
         });
       }
     }
@@ -422,6 +498,8 @@ const executeGroup = ({
       currentBlockId,
       sessionStore,
       userMessageIndex,
+      returnEdgeId,
+      debug,
     });
   }
 
@@ -489,4 +567,23 @@ const convertChatMessageToTranscriptMessage = (
       return null;
     }
   }
+};
+
+const applyVariables = (
+  setVariableHistory: QueueIterator<SetVarSnapshot>,
+  typebot: TypebotInSessionV6 | TypebotInSessionV5,
+) => {
+  const currentBlockIndex = setVariableHistory.peek()?.blockIndex;
+  const updatedVariableIds: string[] = [];
+  do {
+    const setVarItem = setVariableHistory.next();
+    // We simulate the case where the same variable is updated twice on the same block. On runtime the first variable item is matched so we can ignore further items
+    if (!setVarItem || updatedVariableIds.includes(setVarItem.variableId))
+      continue;
+    typebot.variables = applySetVariable(setVarItem, typebot);
+    updatedVariableIds.push(setVarItem.variableId);
+  } while (
+    isDefined(currentBlockIndex) &&
+    setVariableHistory.peek()?.blockIndex === currentBlockIndex
+  );
 };
